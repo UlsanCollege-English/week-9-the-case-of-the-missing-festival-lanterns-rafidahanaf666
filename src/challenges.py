@@ -1,14 +1,4 @@
-"""Week 9 Homework: The Case of the Missing Festival Lanterns.
-
-Read HOMEWORK_BRIEF.md for the full assignment instructions.
-
-Run tests with:
-
-    pytest -q
-
-Do not solve this by only printing output.
-The function must return a report dictionary.
-"""
+"""Week 9 Homework: The Case of the Missing Festival Lanterns."""
 
 EXPECTED_LANTERNS = {
     "river-dragon",
@@ -44,60 +34,49 @@ def analyze_lanterns(
     lantern_log: list[tuple[str, str]],
     correct_sections: dict[str, str],
 ) -> dict[str, object]:
-    """Analyze festival lantern records and return a report.
+    # TODO 1: Create the collections
+    seen_lanterns = set()
+    seen_once = set()
+    duplicate_lanterns = set()
+    count_by_section = {}
+    wrong_section_lanterns = {}
 
-    Args:
-        expected_lanterns:
-            A set of lantern names that should appear at the festival.
-        lantern_log:
-            A list of records. Each record is a tuple:
-            (lantern_name, actual_section).
-        correct_sections:
-            A dictionary where each key is an expected lantern name and each
-            value is the section where that lantern should appear.
+    # TODO 2 & 3: Loop through lantern_log
+    for lantern_name, actual_section in lantern_log:
+        # Track seen lanterns and duplicates
+        if lantern_name in seen_once:
+            duplicate_lanterns.add(lantern_name)
+        else:
+            seen_once.add(lantern_name)
+        seen_lanterns.add(lantern_name)
 
-    Returns:
-        A dictionary with these keys:
-            - "seen_lanterns": set[str]
-            - "missing_lanterns": set[str]
-            - "unexpected_lanterns": set[str]
-            - "duplicate_lanterns": set[str]
-            - "count_by_section": dict[str, int]
-            - "wrong_section_lanterns": dict[str, dict[str, str]]
+        # Count by section
+        count_by_section[actual_section] = count_by_section.get(actual_section, 0) + 1
 
-    Important rules:
-        - Return the dictionary. Do not only print it.
-        - Only expected lanterns should be checked for wrong sections.
-        - Unexpected lanterns should not appear in wrong_section_lanterns.
-        - If an expected lantern appears in more than one wrong section, record
-          the first wrong section found in the log.
-    """
+        # Check wrong sections for expected lanterns only
+        if lantern_name in expected_lanterns:
+            expected_section = correct_sections.get(lantern_name)
+            if expected_section and actual_section != expected_section:
+                # Only record the FIRST wrong section found
+                if lantern_name not in wrong_section_lanterns:
+                    wrong_section_lanterns[lantern_name] = {
+                        "expected": expected_section,
+                        "actual": actual_section,
+                    }
 
-    # TODO 1: Create the collections you need.
-    # Suggested names:
-    # seen_lanterns = set()
-    # seen_once = set()
-    # duplicate_lanterns = set()
-    # count_by_section = {}
-    # wrong_section_lanterns = {}
+    # TODO 4: Set operations
+    missing_lanterns = expected_lanterns - seen_lanterns
+    unexpected_lanterns = seen_lanterns - expected_lanterns
 
-    # TODO 2: Loop through lantern_log.
-    # Each record has:
-    # lantern_name, actual_section
-
-    # TODO 3: During the loop:
-    # - add each lantern name to seen_lanterns
-    # - use seen_once to detect duplicate lantern names
-    # - count how many records appear in each section
-    # - check wrong sections for expected lanterns only
-
-    # TODO 4: After the loop, use set operations:
-    # missing_lanterns = expected_lanterns - seen_lanterns
-    # unexpected_lanterns = seen_lanterns - expected_lanterns
-
-    # TODO 5: Return the full report dictionary with all required keys.
-
-    raise NotImplementedError("Complete analyze_lanterns in src/challenges.py")
+    # TODO 5: Return the full report
+    return {
+        "seen_lanterns": seen_lanterns,
+        "missing_lanterns": missing_lanterns,
+        "unexpected_lanterns": unexpected_lanterns,
+        "duplicate_lanterns": duplicate_lanterns,
+        "count_by_section": count_by_section,
+        "wrong_section_lanterns": wrong_section_lanterns,
+    }
 
 
 if __name__ == "__main__":
